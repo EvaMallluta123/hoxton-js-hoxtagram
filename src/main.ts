@@ -25,6 +25,15 @@ fetch(`http://localhost:3333/images`)
     render()
 })
 }
+function updateLikes (image) {
+    return fetch(`http://localhost:3333/images/${image.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(image)
+    }).then(resp => resp.json())
+  }
 function render(){
     let conteinerEl= document.querySelector<HTMLElement>(`.image-container`)
     if(conteinerEl===null) return 
@@ -49,6 +58,11 @@ function render(){
     let buttonEl=document.createElement("button")
     buttonEl.className=("like-button")
     buttonEl.textContent=("♥")
+    buttonEl.addEventListener("click" ,function(){
+        image.likes++
+        updateLikes(image)
+        render()
+    }) 
     divEl.append(spanEl,buttonEl)
 
     let ulEl=document.createElement("ul")
