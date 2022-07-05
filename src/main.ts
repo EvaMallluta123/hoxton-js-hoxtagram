@@ -26,15 +26,62 @@ fetch(`http://localhost:3333/images`)
 })
 }
 function updateLikes (image) {
+    let imageCopy={...image}
+    delete imageCopy.coment
     return fetch(`http://localhost:3333/images/${image.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(image)
+      body: JSON.stringify(imageCopy)
     }).then(resp => resp.json())
   }
-function render(){
+  function createNewComment(content, imageId){
+    fetch('http://localhost:3333/comments', {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        content,
+          imageId
+        
+      })
+})
+    .then(resp => resp.json())
+    .then(newComment =>{
+        let image= state.images.find(image=> image.id===newComment.imageId)
+        image?.comments.push(newComment)
+        render(imageId)
+    })
+    
+    
+  }
+  function deleteComent(comentId:number){
+    fetch(`http://localhost:3333/images/${comentId}`, {
+        method:`Delete`
+    }).then(()=>{
+        getImagesFromServer()
+    })
+  
+  }
+  function createdeletedButton(comment:CommentData, commentsUl:CommentData){
+    let buttonrubishLi= document.createElement("li")
+    buttonrubishLi.className="comment"
+    let buttonrubishSpan= document.createElement("span")
+    buttonrubishSpan.textContent=comment.content
+
+    let buttonrubish= document.createElement("button")
+    buttonrubish.textContent=("🗑")
+    buttonrubish.addEventListener(`click`, function(){
+        deleteComent(comment.id)
+    })
+
+    buttonrubishLi.append(buttonrubish,buttonrubish)
+    commentsUl.append(buttonrubishLi)
+
+  }
+function render(imageId,comentsUl){
     let conteinerEl= document.querySelector<HTMLElement>(`.image-container`)
     if(conteinerEl===null) return 
     conteinerEl.textContent=""
@@ -61,7 +108,7 @@ function render(){
     buttonEl.addEventListener("click" ,function(){
         image.likes++
         updateLikes(image)
-        render()
+        render(imageId, comentsUl)
     }) 
     divEl.append(spanEl,buttonEl)
 
@@ -73,7 +120,30 @@ function render(){
     ulEl.append(liEl)
     }
     articleEl.append(titleEl, imgEl,divEl ,ulEl)
-    conteinerEl.append(articleEl)
+
+    let formiEl=document.createElement("form")
+    formiEl.className=("comment-form")
+    formiEl.addEventListener("submit", function(event)
+    {
+      event.preventDefault()
+      createNewComment(inputEl.value, image.id)
+     render(imageId)
+    })
+    let inputEl=document.createElement("input")
+    inputEl.className=("comment-input")
+    inputEl.type="text"
+    inputEl.name="comment"
+    inputEl.placeholder="Add a comment..."
+      let buttonEl2=document.createElement("button")
+      buttonEl2.className=("comment-button")
+      buttonEl2.type="submit"
+      buttonEl2.textContent=("Post")
+      for(let comment of image.comments.slice(-4)){
+      createdeletedButton(comment)}
+      
+    formiEl.append(inputEl, buttonEl2)
+    conteinerEl.append(articleEl, formiEl)
+
     }
 }
 getImagesFromServer()
