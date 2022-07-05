@@ -65,7 +65,7 @@ function updateLikes (image) {
     })
   
   }
-  function createdeletedButton(comment:CommentData, commentsUl:CommentData){
+  function createdeletedButton(comment:CommentData, commentsUl:HTMLElement){
     let buttonrubishLi= document.createElement("li")
     buttonrubishLi.className="comment"
     let buttonrubishSpan= document.createElement("span")
@@ -81,7 +81,7 @@ function updateLikes (image) {
     commentsUl.append(buttonrubishLi)
 
   }
-function render(imageId,comentsUl){
+function render(imageId){
     let conteinerEl= document.querySelector<HTMLElement>(`.image-container`)
     if(conteinerEl===null) return 
     conteinerEl.textContent=""
@@ -108,7 +108,7 @@ function render(imageId,comentsUl){
     buttonEl.addEventListener("click" ,function(){
         image.likes++
         updateLikes(image)
-        render(imageId, comentsUl)
+        render(imageId)
     }) 
     divEl.append(spanEl,buttonEl)
 
@@ -139,7 +139,7 @@ function render(imageId,comentsUl){
       buttonEl2.type="submit"
       buttonEl2.textContent=("Post")
       for(let comment of image.comments.slice(-4)){
-      createdeletedButton(comment)}
+      createdeletedButton(comment, inputEl)}
       
     formiEl.append(inputEl, buttonEl2)
     conteinerEl.append(articleEl, formiEl)
@@ -147,4 +147,4 @@ function render(imageId,comentsUl){
     }
 }
 getImagesFromServer()
-render()
+render(Image)
